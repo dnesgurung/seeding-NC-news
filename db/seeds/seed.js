@@ -1,6 +1,6 @@
 const db = require("../connection");
 const format = require("pg-format");
-const {convertTimestampToDate} = require("../seeds/utils");
+const {convertTimestampToDate, createRef} = require("../seeds/utils");
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   //<< write your first query in here.
@@ -96,13 +96,15 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       ];
     });
     const insertArticlesQuery = format( `INSERT INTO articles
-      ( title, topic, author, body, created_at, votes, article_img_url) VALUES %L`, formattedArticles);
+      ( title, topic, author, body, created_at, votes, article_img_url) VALUES %L RETURNING *`, formattedArticles);
       return db.query(insertArticlesQuery)
   })
-  .then(()=>{
+  .then((result)=>{
+    const articlesRefObject = createRef(result.rows);
     const formattedComments = commentData.map((comment)=> {
-      const correctedComment = convertTimestampToDate(comment);
+    const correctedComment = convertTimestampToDate(comment);
       return [
+        articlesRefObject[comment.article_title],
         correctedComment.body,
         correctedComment.votes,
         correctedComment.author,
@@ -110,8 +112,11 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       ];
     });
     const insertCommentQuery = format( `INSERT INTO comments
-      (body, votes, author, created_at) VALUES %L`, formattedComments);
+      (article_id, body, votes, author, created_at) VALUES %L`, formattedComments);
     return db.query(insertCommentQuery);
+  })
+  .then(()=>{
+    console.log("Seed Complete");
   })
 
 };

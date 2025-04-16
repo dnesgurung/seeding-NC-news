@@ -1,5 +1,5 @@
 const {
-  convertTimestampToDate
+  convertTimestampToDate, createRef
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
@@ -38,3 +38,57 @@ describe("convertTimestampToDate", () => {
   });
 });
 
+describe("createRef", ()=>{
+  test("returns an empty object when arguments is passed through", ()=> {
+    const input = [];
+    const expectedResult = {};
+    const result = createRef(input);
+    expect(result).toEqual(expectedResult);
+  });
+
+  test("should return a single key and value pair when passed through a single object argument", ()=> {
+    const input = [    
+      {
+      article_id: 3,
+      title: 'Eight pug gifs that remind me of mitch',
+      topic: 'mitch',
+      author: 'icellusedkars',
+      body: 'some gifs',
+      created_at: '2020-11-03T09:12:00.000Z',
+      votes: 0,
+      article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+    }
+    ];
+    const expectedResult = { 'Eight pug gifs that remind me of mitch': 3};
+    const result = createRef(input);
+    expect(result).toEqual(expectedResult);
+  });
+
+  test("Should return multiple key and value pair when argument passed through has multiple objects", ()=>{
+    const input = [
+      {
+        article_id: 7,
+        title: 'Z',
+        topic: 'mitch',
+        author: 'icellusedkars',
+        body: 'I was hungry.',
+        created_at: '2020-01-07T14:08:00.000Z',
+        votes: 0,
+        article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+      },
+      {
+        article_id: 8,
+        title: 'Does Mitch predate civilisation?',
+        topic: 'mitch',
+        author: 'icellusedkars',
+        body: 'Archaeologists have uncovered a gigantic statue from the dawn of humanity, and it has an uncanny resemblance to Mitch. Surely I am not the only person who can see this?!',
+        created_at: '2020-04-17T01:08:00.000Z',
+        votes: 0,
+        article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+      }
+    ];
+    const expectedResult = {'Z': 7, 'Does Mitch predate civilisation?': 8 };
+    const result = createRef(input);
+    expect(result).toEqual(expectedResult);
+  })
+})
