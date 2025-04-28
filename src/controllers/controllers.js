@@ -10,3 +10,7 @@ exports.getTopics = (req, res) => {
     res.status(200).send({ topics });
   });
 };
+
+exports.catchAll = (err, req, res) => {
+    res.status(500).send({msg: "internal server error!"})
+}
