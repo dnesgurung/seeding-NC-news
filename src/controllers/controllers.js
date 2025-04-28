@@ -11,6 +11,7 @@ exports.getTopics = (req, res) => {
   });
 };
 
+3-get-article-by-id
 exports.getArticleById = (req, res, next) => {
     const articleId = req.params.article_id;
     return selectArticleById(articleId).then((article)=> {
@@ -19,3 +20,4 @@ exports.getArticleById = (req, res, next) => {
     .catch(next);
 
 }
+
