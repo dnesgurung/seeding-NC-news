@@ -1,5 +1,5 @@
 const endpoints = require("../../endpoints.json");
-const { selectTopics } = require("../models/models");
+const { selectTopics, selectArticleById} = require("../models/models");
 
 exports.getApi = (request, response) => {
   response.status(200).send({ endpoints });
@@ -11,6 +11,13 @@ exports.getTopics = (req, res) => {
   });
 };
 
-exports.catchAll = (err, req, res) => {
-    res.status(500).send({msg: "internal server error!"})
+3-get-article-by-id
+exports.getArticleById = (req, res, next) => {
+    const articleId = req.params.article_id;
+    return selectArticleById(articleId).then((article)=> {
+        res.status(200).send({article})
+    })
+    .catch(next);
+
 }
+
