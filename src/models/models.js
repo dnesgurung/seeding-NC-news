@@ -27,14 +27,34 @@ exports.selectAllArticles = () => {
         articles.created_at, 
         articles.votes, 
         articles.article_img_url, 
-        COUNT(comments.article_id) :: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id`
-  ;
-  let greenList = "created_at"
+        COUNT(comments.article_id) :: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id`;
+  let greenList = "created_at";
   let sortQuery = ` ORDER BY ${greenList} DESC`;
 
   queryStr += sortQuery;
 
   return db.query(queryStr).then(({ rows }) => {
+    return rows;
+  });
+};
+
+exports.selectAllCommentsForArticle = (articleId) => {
+  let queryStr = `SELECT * FROM comments`;
+  let queryArgs = [];
+
+  let greenListSort = "created_at";
+  let sortQuery = ` ORDER BY ${greenListSort} ASC`
+  
+  if (articleId) {
+    queryStr += ` WHERE article_id = $1`;
+    queryStr += sortQuery
+    queryArgs.push(articleId);
+  }
+
+  return db.query(queryStr, queryArgs).then(({ rows }) => {
+    if(rows.length === 0) {
+      return Promise.reject({status: 404, msg: `No comments found for article_id ${articleId}`})
+    }
     return rows;
   });
 };
