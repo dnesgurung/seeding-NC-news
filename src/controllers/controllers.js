@@ -3,6 +3,7 @@ const {
   selectTopics,
   selectArticleById,
   selectAllArticles,
+  selectAllCommentsForArticle,
 } = require("../models/models");
 
 exports.getApi = (request, response) => {
@@ -25,8 +26,16 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res) => {
- 
   return selectAllArticles().then((articles) => {
     res.status(200).send({ articles });
   });
+};
+
+exports.getAllCommentsForArticle = (req, res, next) => {
+  const articleId = req.params.article_id;
+
+  return selectAllCommentsForArticle(articleId).then((comments) => {
+    res.status(200).send({ comments });
+  })
+  .catch(next);
 };

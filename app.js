@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('./db/connection');
 
-const {getApi, getTopics, getArticleById, getAllArticles} = require('./src/controllers/controllers');
+const {getApi, getTopics, getArticleById, getAllArticles, getAllCommentsForArticle} = require('./src/controllers/controllers');
 const { handlePSQLErrors, catchAllErrors, handleCustomErrors } = require('./src/controllers/error.controller');
 
 
@@ -19,6 +19,7 @@ app.get('/api/articles/:article_id', getArticleById)
 
 app.get('/api/articles', getAllArticles)
 
+app.get('/api/articles/:article_id/comments', getAllCommentsForArticle)
 
 
 app.all('/*splat', (req, res)=> {

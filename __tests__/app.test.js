@@ -116,15 +116,89 @@ describe("GET /api/articles", () => {
       });
   });
 
-  test("200: OK if responds the article sorted by date in descending order", ()=> {
+  test("200: OK if responds the article sorted by date in descending order", () => {
     return request(app)
-    .get("/api/articles")
-    .expect(200)
-    .then(({body: {articles}})=> {
-      expect(articles).toBeSortedBy("created_at", {descending: true})
-    })
-  })
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
 
+describe("GET /api/articles/:article_id/comments ", () => {
+  test("200: OK if returns an array for comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/6/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toEqual([
+          {
+            comment_id: 16,
+            article_id: 6,
+            body: "This is a bad article name",
+            votes: 1,
+            author: "butter_bridge",
+            created_at: "2020-10-11T15:23:00.000Z",
+          },
+        ]);
+      });
+  });
+  test("200: OK if it returns an array of comments for the given article_id if it has numerous comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(11);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
 
+  test("200: OK if the array of comments are sorted with the most recent comment first ", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBeGreaterThan(0);
+        expect(comments).toBeSortedBy("created_at");
+      });
+  });
 
+  // Error Handling
+
+  test("400: Bad Request if the article_id is not a number", () => {
+    return request(app)
+      .get("/api/articles/NumberInWords/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("404: Not Found when passed a valid article_id but does not exist in the db", () => {
+    return request(app)
+      .get("/api/articles/5000/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No comments found for article_id 5000");
+      });
+  });
+
+  test("404: Not Found when passed a valid article_id but doesn't have any comments", () => {
+    return request(app)
+    .get("/api/articles/2/comments")
+    .expect(404)
+    .then(({ body: { msg } }) => {
+      expect(msg).toBe("No comments found for article_id 2");
+    });
+  });
 });
