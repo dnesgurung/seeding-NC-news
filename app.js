@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('./db/connection');
 
-const {getApi, getTopics, getArticleById} = require('./src/controllers/controllers');
+const {getApi, getTopics, getArticleById, getAllArticles} = require('./src/controllers/controllers');
 const { handlePSQLErrors, catchAllErrors, handleCustomErrors } = require('./src/controllers/error.controller');
 
 
@@ -16,6 +16,8 @@ app.get('/api', getApi);
 app.get('/api/topics', getTopics )
 
 app.get('/api/articles/:article_id', getArticleById)
+
+app.get('/api/articles', getAllArticles)
 
 
 
