@@ -62,7 +62,6 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body: { article } }) => {
-    
         expect(article).toMatchObject({
           author: expect.any(String),
           title: expect.any(String),
@@ -76,21 +75,56 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 
-  test("400: Bad Request if the article_id is not a number", ()=> {
+  test("400: Bad Request if the article_id is not a number", () => {
     return request(app)
-    .get("/api/articles/notANumber")
-    .expect(400)
-    .then(({body: {msg}})=> {
-      expect(msg).toBe("Bad Request!");
+      .get("/api/articles/notANumber")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("404: valid but article_id is out of range", () => {
+    return request(app)
+      .get("/api/articles/1234567")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found!");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200: OK if responds with an article array with comment_count property without body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(13);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+
+  test("200: OK if responds the article sorted by date in descending order", ()=> {
+    return request(app)
+    .get("/api/articles")
+    .expect(200)
+    .then(({body: {articles}})=> {
+      expect(articles).toBeSortedBy("created_at", {descending: true})
     })
   })
 
-  test("404: valid but article_id is out of range", ()=> {
-    return request(app)
-    .get("/api/articles/1234567")
-    .expect(404)
-    .then(({body: {msg}})=> {
-      expect(msg).toBe("Article not found!")
-    })
-  })
+
+
 });
