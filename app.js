@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('./db/connection');
 
-const {getApi, getTopics, getArticleById, getAllArticles, getAllCommentsForArticle} = require('./src/controllers/controllers');
+const {getApi, getTopics, getArticleById, getAllArticles, getAllCommentsForArticle, postCommentsForAnArticle} = require('./src/controllers/controllers');
 const { handlePSQLErrors, catchAllErrors, handleCustomErrors } = require('./src/controllers/error.controller');
 
 
@@ -19,8 +19,9 @@ app.get('/api/articles/:article_id', getArticleById)
 
 app.get('/api/articles', getAllArticles)
 
-app.get('/api/articles/:article_id/comments', getAllCommentsForArticle)
+app.get('/api/articles/:article_id/comments', getAllCommentsForArticle);
 
+app.post('/api/articles/:article_id/comments', postCommentsForAnArticle);
 
 app.all('/*splat', (req, res)=> {
     res.status(404).send({msg: 'invalid url!'})

@@ -4,6 +4,7 @@ const {
   selectArticleById,
   selectAllArticles,
   selectAllCommentsForArticle,
+  insertComments
 } = require("../models/models");
 
 exports.getApi = (request, response) => {
@@ -33,9 +34,24 @@ exports.getAllArticles = (req, res) => {
 
 exports.getAllCommentsForArticle = (req, res, next) => {
   const articleId = req.params.article_id;
-
   return selectAllCommentsForArticle(articleId).then((comments) => {
     res.status(200).send({ comments });
   })
   .catch(next);
 };
+
+exports.postCommentsForAnArticle = (req, res, next)=> {
+  const articleId = req.params.article_id;
+  const {username, body} = req.body
+  //console.log(articleId);
+
+  return insertComments( username, body, articleId).then((comment)=> {
+    //console.log(comment, "<<< controller");
+    res.status(201).send({comment});
+  })
+  .catch((err)=> {
+    //console.log(err);
+    next(err);
+    
+  });
+}
