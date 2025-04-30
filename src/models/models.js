@@ -70,13 +70,12 @@ exports.insertComments = (username, body, articleId) => {
     });
   }
 
-  if(!body) {
+  if (!body) {
     return Promise.reject({
       status: 400,
-      msg: "Missing Comments!"
-    })
+      msg: "Missing Comments!",
+    });
   }
-
 
   return db
     .query(
@@ -85,6 +84,37 @@ exports.insertComments = (username, body, articleId) => {
       [username, body, articleId]
     )
     .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+exports.updateArticleByArticleId = (inc_votes, articleId) => {
+  if (typeof inc_votes !== "number" && inc_votes) {
+    return Promise.reject({
+      status: 400,
+      msg: "Vote needs to be a number not a string!",
+    });
+  }
+  if (!inc_votes) {
+    return Promise.reject({
+      status: 400,
+      msg: "Please enter a valid vote!",
+    });
+  }
+
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`,
+      [inc_votes, articleId]
+    )
+    .then(({ rows }) => {
+      //console.log(rows);
+      if (rows.length === 0 || rows.length === undefined) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article ${articleId} Not Found!`,
+        });
+      }
       return rows[0];
     });
 };
