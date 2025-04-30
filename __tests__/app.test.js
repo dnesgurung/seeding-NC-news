@@ -203,7 +203,7 @@ describe("GET /api/articles/:article_id/comments ", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("201: OK if responds with the newly posted comment", () => {
     const newComment = {
       username: "butter_bridge",
@@ -286,6 +286,108 @@ describe.only("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Missing Comments!");
+      });
+  });
+});
+
+describe.only("PATCH /api/articles/:article_id", () => {
+  test("200: OK if responds with the updated article", () => {
+    const patchArticle = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchArticle)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        //console.log(article);
+        expect(article.votes).toBe(1);
+        expect(Object.keys(article).length).toBe(8);
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test("200 : OK responds with the updated article for negative vote value", () => {
+    const patchArticle = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchArticle)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        //console.log(article);
+        expect(article.votes).toBe(0);
+        expect(Object.keys(article).length).toBe(8);
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+
+  // Error Handling
+  test("400: Bad Request if the article_id is not a number", () => {
+    const patchArticle = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/NumberInWords")
+      .send(patchArticle)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Bad Request if given vote is not a number", () => {
+    const patchArticle = {
+      inc_votes: "Twenty",
+    };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchArticle)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Vote needs to be a number not a string!");
+      });
+  });
+
+  test("404: Not Found when the article_id passed through is a valid number but is not in the database", () => {
+    const patchArticle = {
+      inc_votes: 20,
+    };
+    return request(app)
+      .patch("/api/articles/500")
+      .send(patchArticle)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article 500 Not Found!");
+      });
+  });
+
+  test("400: Bad Response when empty object of vote is entered", () => {
+    const patchArticle = {};
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchArticle)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Please enter a valid vote!");
       });
   });
 });
