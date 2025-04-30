@@ -43,18 +43,48 @@ exports.selectAllCommentsForArticle = (articleId) => {
   let queryArgs = [];
 
   let greenListSort = "created_at";
-  let sortQuery = ` ORDER BY ${greenListSort} ASC`
-  
+  let sortQuery = ` ORDER BY ${greenListSort} ASC`;
+
   if (articleId) {
     queryStr += ` WHERE article_id = $1`;
-    queryStr += sortQuery
+    queryStr += sortQuery;
     queryArgs.push(articleId);
   }
 
   return db.query(queryStr, queryArgs).then(({ rows }) => {
-    if(rows.length === 0) {
-      return Promise.reject({status: 404, msg: `No comments found for article_id ${articleId}`})
+    if (rows.length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: `No comments found for article_id ${articleId}`,
+      });
     }
     return rows;
   });
+};
+
+exports.insertComments = (username, body, articleId) => {
+  if (!username) {
+    return Promise.reject({
+      status: 400,
+      msg: "Missing Username!",
+    });
+  }
+
+  if(!body) {
+    return Promise.reject({
+      status: 400,
+      msg: "Missing Comments!"
+    })
+  }
+
+
+  return db
+    .query(
+      `INSERT INTO comments (author, body, article_id) 
+      VALUES($1, $2, $3) RETURNING *`,
+      [username, body, articleId]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
 };
