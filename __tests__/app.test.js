@@ -492,3 +492,24 @@ describe("GET SORT BY /api/articles (sorting queries)", () => {
       });
   });
 });
+
+describe.only("GET /api/articles (topic query)", ()=> {
+
+  test("200: OK if filters the articles by the topic value specified in the query", ()=> {
+    return request(app)
+    .get(`/api/articles?sort_by=topic:"cats"`)
+    .expect(200)
+    .then(({body: {articles}})=> {
+      console.log(articles);
+      expect(articles.length).toBe(1);
+    })
+
+  });
+
+
+
+  xtest("", ()=> {});
+  xtest("", ()=> {});
+  xtest("", ()=> {});
+  xtest("", ()=> {});
+})

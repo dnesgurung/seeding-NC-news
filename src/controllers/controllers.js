@@ -30,6 +30,7 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
+  console.log(req.query);
   const { sort_by, order } = req.query;
   return selectAllArticles(sort_by, order)
     .then((articles) => {
