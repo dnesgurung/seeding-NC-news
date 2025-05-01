@@ -108,7 +108,7 @@ exports.updateArticleByArticleId = (inc_votes, articleId) => {
       [inc_votes, articleId]
     )
     .then(({ rows }) => {
-      //console.log(rows);
+     
       if (rows.length === 0 || rows.length === undefined) {
         return Promise.reject({
           status: 404,
@@ -134,3 +134,12 @@ exports.deleteCommentsByCommentId = (commentsId) => {
       return rows;
     });
 };
+
+exports.selectUsers = ()=> {
+  return db.query(`SELECT * FROM users`)
+  .then(({rows})=> {
+    return rows;
+  })
+
+
+}

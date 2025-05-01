@@ -300,7 +300,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patchArticle)
       .expect(200)
       .then(({ body: { article } }) => {
-        //console.log(article);
         expect(article.votes).toBe(1);
         expect(Object.keys(article).length).toBe(8);
         expect(article).toMatchObject({
@@ -324,7 +323,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patchArticle)
       .expect(200)
       .then(({ body: { article } }) => {
-        //console.log(article);
         expect(article.votes).toBe(0);
         expect(Object.keys(article).length).toBe(8);
         expect(article).toMatchObject({
@@ -392,7 +390,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe.only("DELETE /api/comments/:comment_id", () => {
+describe("DELETE /api/comments/:comment_id", () => {
   test("204: No Content after the given comment is deleted by the comment_id", () => {
     return request(app).delete("/api/comments/1").expect(204);
   });
@@ -415,4 +413,25 @@ describe.only("DELETE /api/comments/:comment_id", () => {
         expect(msg).toBe("Comment Not Found!");
       });
   });
+});
+
+describe("GET /api/users", () => {
+  test("200: responds with an array of users object", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users.length).toBe(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+        expect(users[0].username).toBe("butter_bridge");
+        expect(users[1].name).toBe("sam");
+      });
+  });
+
 });
