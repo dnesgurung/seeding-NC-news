@@ -474,22 +474,21 @@ describe("GET SORT BY /api/articles (sorting queries)", () => {
 
   // Error handling
 
-  test("400: Bad request if invalid sort_by is given", ()=> {
+  test("400: Bad request if invalid sort_by is given", () => {
     return request(app)
-    .get("/api/articles?sort_by=dog&order=asc")
-    .expect(400)
-    .then(({body: {msg}})=> {
-    expect(msg).toBe("Please enter a valid request!")
-    })
+      .get("/api/articles?sort_by=dog&order=asc")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Please enter a valid request!");
+      });
   });
-  
-  test("400: Bad request if invalid order is given", ()=> {
+
+  test("400: Bad request if invalid order is given", () => {
     return request(app)
-    .get("/api/articles?sort_by=votes&order=biggestFirst")
-    .expect(400)
-    .then(({body: {msg}})=> {
-      expect(msg).toBe("Please enter a valid request!")
-    })
-  })
-  
+      .get("/api/articles?sort_by=votes&order=biggestFirst")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Please enter a valid request!");
+      });
+  });
 });

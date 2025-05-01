@@ -11,7 +11,7 @@ const {
   postCommentsForAnArticle,
   patchArticleByArticleId,
   deleteComments,
-  getAllUsers
+  getAllUsers,
 } = require("./src/controllers/controllers");
 const {
   handlePSQLErrors,
@@ -35,9 +35,9 @@ app.post("/api/articles/:article_id/comments", postCommentsForAnArticle);
 
 app.patch("/api/articles/:article_id", patchArticleByArticleId);
 
-app.delete('/api/comments/:comment_id', deleteComments);
+app.delete("/api/comments/:comment_id", deleteComments);
 
-app.get("/api/users", getAllUsers)
+app.get("/api/users", getAllUsers);
 
 app.all("/*splat", (req, res) => {
   res.status(404).send({ msg: "invalid url!" });
