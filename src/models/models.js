@@ -17,8 +17,9 @@ exports.selectArticleById = (articleId) => {
     });
 };
 
-exports.selectAllArticles = () => {
+exports.selectAllArticles = (sort_by, order) => {
   // Query for article without body
+
   let queryStr = `SELECT 
         articles.article_id, 
         articles.title, 
@@ -28,10 +29,40 @@ exports.selectAllArticles = () => {
         articles.votes, 
         articles.article_img_url, 
         COUNT(comments.article_id) :: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id`;
-  let greenList = "created_at";
-  let sortQuery = ` ORDER BY ${greenList} DESC`;
+  let sortGreenList = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
 
-  queryStr += sortQuery;
+  let orderGreenList = ["ASC", "DESC"];
+
+  if (
+    (sort_by && !sortGreenList.includes(sort_by)) ||
+    (order && !orderGreenList.includes(order.toUpperCase()))
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Please enter a valid request!",
+    });
+  }
+
+  if (sort_by && sortGreenList.includes(sort_by)) {
+    queryStr += ` ORDER BY ${sort_by}`;
+  } else {
+    queryStr += ` ORDER BY created_at`;
+  }
+
+  if (order && orderGreenList.includes(order.toUpperCase())) {
+    queryStr += ` ${order}`;
+  } else {
+    queryStr += ` desc`;
+  }
 
   return db.query(queryStr).then(({ rows }) => {
     return rows;
@@ -108,7 +139,6 @@ exports.updateArticleByArticleId = (inc_votes, articleId) => {
       [inc_votes, articleId]
     )
     .then(({ rows }) => {
-     
       if (rows.length === 0 || rows.length === undefined) {
         return Promise.reject({
           status: 404,
@@ -135,11 +165,8 @@ exports.deleteCommentsByCommentId = (commentsId) => {
     });
 };
 
-exports.selectUsers = ()=> {
-  return db.query(`SELECT * FROM users`)
-  .then(({rows})=> {
+exports.selectUsers = () => {
+  return db.query(`SELECT * FROM users`).then(({ rows }) => {
     return rows;
-  })
-
-
-}
+  });
+};
