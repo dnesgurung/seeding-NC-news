@@ -433,5 +433,63 @@ describe("GET /api/users", () => {
         expect(users[1].name).toBe("sam");
       });
   });
+});
 
+describe("GET SORT BY /api/articles (sorting queries)", () => {
+  test("200: OK if article is sort by created_at and descending by default", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("200: OK if article is sorted by created_at and asc as a REQUEST", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at");
+      });
+  });
+
+  test("200: OK if article is sorted by votes and asc as a REQUEST", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("votes");
+      });
+  });
+
+  test("200: OK if article is sorted by author and desc as a REQUEST", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+
+  // Error handling
+
+  test("400: Bad request if invalid sort_by is given", ()=> {
+    return request(app)
+    .get("/api/articles?sort_by=dog&order=asc")
+    .expect(400)
+    .then(({body: {msg}})=> {
+    expect(msg).toBe("Please enter a valid request!")
+    })
+  });
+  
+  test("400: Bad request if invalid order is given", ()=> {
+    return request(app)
+    .get("/api/articles?sort_by=votes&order=biggestFirst")
+    .expect(400)
+    .then(({body: {msg}})=> {
+      expect(msg).toBe("Please enter a valid request!")
+    })
+  })
+  
 });

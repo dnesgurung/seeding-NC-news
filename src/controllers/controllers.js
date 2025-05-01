@@ -29,10 +29,13 @@ exports.getArticleById = (req, res, next) => {
     .catch(next);
 };
 
-exports.getAllArticles = (req, res) => {
-  return selectAllArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+exports.getAllArticles = (req, res, next) => {
+  const { sort_by, order } = req.query;
+  return selectAllArticles(sort_by, order)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
 };
 
 exports.getAllCommentsForArticle = (req, res, next) => {
@@ -47,11 +50,9 @@ exports.getAllCommentsForArticle = (req, res, next) => {
 exports.postCommentsForAnArticle = (req, res, next) => {
   const articleId = req.params.article_id;
   const { username, body } = req.body;
-  
 
   return insertComments(username, body, articleId)
     .then((comment) => {
-  
       res.status(201).send({ comment });
     })
     .catch(next);
@@ -69,7 +70,7 @@ exports.patchArticleByArticleId = (req, res, next) => {
 };
 
 exports.deleteComments = (req, res, next) => {
-  commentsId = req.params.comment_id;
+  const commentsId = req.params.comment_id;
 
   return deleteCommentsByCommentId(commentsId)
     .then(() => {
@@ -78,9 +79,8 @@ exports.deleteComments = (req, res, next) => {
     .catch(next);
 };
 
-exports.getAllUsers = (req, res, next)=> {
-
-  return selectUsers().then((users)=> {
-    res.status(200).send({users});
-  })
-}
+exports.getAllUsers = (req, res, next) => {
+  return selectUsers().then((users) => {
+    res.status(200).send({ users });
+  });
+};
