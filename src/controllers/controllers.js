@@ -7,6 +7,7 @@ const {
   insertComments,
   updateArticleByArticleId,
   deleteCommentsByCommentId,
+  selectUsers,
 } = require("../models/models");
 
 exports.getApi = (request, response) => {
@@ -46,11 +47,11 @@ exports.getAllCommentsForArticle = (req, res, next) => {
 exports.postCommentsForAnArticle = (req, res, next) => {
   const articleId = req.params.article_id;
   const { username, body } = req.body;
-  //console.log(articleId);
+  
 
   return insertComments(username, body, articleId)
     .then((comment) => {
-      //console.log(comment, "<<< controller");
+  
       res.status(201).send({ comment });
     })
     .catch(next);
@@ -76,3 +77,10 @@ exports.deleteComments = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getAllUsers = (req, res, next)=> {
+
+  return selectUsers().then((users)=> {
+    res.status(200).send({users});
+  })
+}
