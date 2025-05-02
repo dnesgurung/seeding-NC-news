@@ -6,6 +6,7 @@ const data = require("../db/data/test-data");
 const request = require("supertest");
 const express = require("express");
 const app = require("../app");
+
 /* Set up your beforeEach & afterAll functions here */
 
 beforeEach(() => {
@@ -492,16 +493,15 @@ describe("GET SORT BY /api/articles (sorting queries)", () => {
       });
   });
 
-  test("200: will sort by default created_at when sort_by is misspelled", ()=> {
+  test("200: will sort by default created_at when sort_by is misspelled", () => {
     return request(app)
-    .get("/api/articles?sortby=votes&order=desc")
-    .expect(200)
-    .then(({ body: { articles } }) => {
-      expect(Array.isArray(articles)).toBe(true);
-      expect(articles).toBeSortedBy("created_at", {descending: true})    
-    });
-  })
-
+      .get("/api/articles?sortby=votes&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
 });
 
 describe("GET /api/articles (topic query)", () => {
@@ -547,16 +547,43 @@ describe("GET /api/articles (topic query)", () => {
       });
   });
 
-  //Error Handling
-  test("200: returns an empty array when invalid topic is requested", () => {
+  test("200: should return an empty array for topics with no associated articles", () => {
     return request(app)
-    .get("/api/articles?topic=invalidtopic")
-    .expect(200)
-    .then(({body: {articles}})=> {
-      expect(articles).toHaveLength(0);
-      expect(Array.isArray(articles)).toBe(true);
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(0);
+        expect(Array.isArray(articles)).toBe(true);
+      });
+  });
+
+  //Error Handling
+  test("404: Not Found when invalid topic is requested", () => {
+    return request(app)
+      .get("/api/articles?topic=invalidtopic")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Topic Not Found!");
+      });
+  });
+
+  test("400 : Bad Request when invalid sort_by request is given", ()=> {
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=bananas")
+    .expect(400)
+    .then(({body: {msg}})=> {
+      expect(msg).toBe("Please enter a valid request!")
     })
   });
 
 
+  test("400 : Bad Request when invalid order request is given", ()=> {
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=bananas&order=ascending")
+    .expect(400)
+    .then(({body: {msg}})=> {
+      expect(msg).toBe("Please enter a valid request!")
+    })
+  });
+ 
 });
