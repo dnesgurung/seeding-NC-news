@@ -17,7 +17,7 @@ exports.selectArticleById = (articleId) => {
     });
 };
 
-exports.selectAllArticles = (sort_by, order) => {
+exports.selectAllArticles = (sort_by, order, topic) => {
   // Query for article without body
 
   let queryStr = `SELECT 
@@ -28,7 +28,10 @@ exports.selectAllArticles = (sort_by, order) => {
         articles.created_at, 
         articles.votes, 
         articles.article_img_url, 
-        COUNT(comments.article_id) :: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id`;
+        COUNT(comments.article_id) :: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+  const queryValues = [];
+
   let sortGreenList = [
     "article_id",
     "title",
@@ -51,6 +54,15 @@ exports.selectAllArticles = (sort_by, order) => {
       msg: "Please enter a valid request!",
     });
   }
+  // Filter by
+  if (topic && !sortGreenList.includes(topic)) {
+    queryStr += ` WHERE articles.topic = $1`;
+    queryValues.push(topic);
+  }
+
+  queryStr += ` GROUP BY articles.article_id`;
+
+  // Sort by and order
 
   if (sort_by && sortGreenList.includes(sort_by)) {
     queryStr += ` ORDER BY ${sort_by}`;
@@ -64,7 +76,7 @@ exports.selectAllArticles = (sort_by, order) => {
     queryStr += ` desc`;
   }
 
-  return db.query(queryStr).then(({ rows }) => {
+  return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;
   });
 };
