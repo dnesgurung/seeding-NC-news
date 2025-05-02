@@ -559,6 +559,7 @@ describe("GET /api/articles (topic query)", () => {
 
   //Error Handling
   test("404: Not Found when invalid topic is requested", () => {
+
     return request(app)
       .get("/api/articles?topic=invalidtopic")
       .expect(404)
@@ -596,6 +597,7 @@ describe("GET /api/articles/:article_id (comment_count) ", () => {
         expect(article.comment_count).toBe(11);
       });
   });
+  
 
   test("200: OK if responds with an object with comment_count as 0 if there is no comment for that article ", () => {
     return request(app)
