@@ -492,16 +492,15 @@ describe("GET SORT BY /api/articles (sorting queries)", () => {
       });
   });
 
-  test("200: will sort by default created_at when sort_by is misspelled", ()=> {
+  test("200: will sort by default created_at when sort_by is misspelled", () => {
     return request(app)
-    .get("/api/articles?sortby=votes&order=desc")
-    .expect(200)
-    .then(({ body: { articles } }) => {
-      expect(Array.isArray(articles)).toBe(true);
-      expect(articles).toBeSortedBy("created_at", {descending: true})    
-    });
-  })
-
+      .get("/api/articles?sortby=votes&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
 });
 
 describe("GET /api/articles (topic query)", () => {
@@ -550,13 +549,52 @@ describe("GET /api/articles (topic query)", () => {
   //Error Handling
   test("200: returns an empty array when invalid topic is requested", () => {
     return request(app)
-    .get("/api/articles?topic=invalidtopic")
-    .expect(200)
-    .then(({body: {articles}})=> {
-      expect(articles).toHaveLength(0);
-      expect(Array.isArray(articles)).toBe(true);
-    })
+      .get("/api/articles?topic=invalidtopic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(0);
+        expect(Array.isArray(articles)).toBe(true);
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id (comment_count) ", () => {
+  test("200: OK if responds with an object with comment_count as property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toHaveProperty("comment_count");
+        expect(article.comment_count).toBe(11);
+      });
   });
 
+  test("200: OK if responds with an object with comment_count as 0 if there is no comment for that article ", () => {
+    return request(app)
+      .get("/api/articles/2")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toHaveProperty("comment_count");
+        expect(article.comment_count).toBe(0);
+      });
+  });
 
+  //Error Handling
+
+  test("404: Not found if article is not present for the article_id", () => {
+    return request(app)
+      .get("/api/articles/5000")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found!");
+      });
+  });
+  test("400: Bad Reqest if the given article_id is not a number", () => {
+    return request(app)
+      .get("/api/articles/notANumber")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
 });
