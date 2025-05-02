@@ -559,6 +559,7 @@ describe("GET /api/articles (topic query)", () => {
 
   //Error Handling
   test("404: Not Found when invalid topic is requested", () => {
+
     return request(app)
       .get("/api/articles?topic=invalidtopic")
       .expect(404)
@@ -567,23 +568,63 @@ describe("GET /api/articles (topic query)", () => {
       });
   });
 
-  test("400 : Bad Request when invalid sort_by request is given", ()=> {
+  test("400 : Bad Request when invalid sort_by request is given", () => {
     return request(app)
-    .get("/api/articles?topic=mitch&sort_by=bananas")
-    .expect(400)
-    .then(({body: {msg}})=> {
-      expect(msg).toBe("Please enter a valid request!")
-    })
+      .get("/api/articles?topic=mitch&sort_by=bananas")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Please enter a valid request!");
+      });
   });
 
-
-  test("400 : Bad Request when invalid order request is given", ()=> {
+  test("400 : Bad Request when invalid order request is given", () => {
     return request(app)
-    .get("/api/articles?topic=mitch&sort_by=bananas&order=ascending")
-    .expect(400)
-    .then(({body: {msg}})=> {
-      expect(msg).toBe("Please enter a valid request!")
-    })
+      .get("/api/articles?topic=mitch&sort_by=bananas&order=ascending")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Please enter a valid request!");
+      });
   });
- 
+});
+
+describe("GET /api/articles/:article_id (comment_count) ", () => {
+  test("200: OK if responds with an object with comment_count as property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toHaveProperty("comment_count");
+        expect(article.comment_count).toBe(11);
+      });
+  });
+  
+
+  test("200: OK if responds with an object with comment_count as 0 if there is no comment for that article ", () => {
+    return request(app)
+      .get("/api/articles/2")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toHaveProperty("comment_count");
+        expect(article.comment_count).toBe(0);
+      });
+  });
+
+  //Error Handling
+
+  test("404: Not found if article is not present for the article_id", () => {
+    return request(app)
+      .get("/api/articles/5000")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found!");
+      });
+  });
+  test("400: Bad Reqest if the given article_id is not a number", () => {
+    return request(app)
+      .get("/api/articles/notANumber")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
 });
