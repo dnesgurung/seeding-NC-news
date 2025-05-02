@@ -20,6 +20,22 @@ exports.selectArticleById = (articleId) => {
 exports.selectAllArticles = (sort_by, order, topic) => {
   // Query for article without body
 
+  const checkIfTopicExists = (topic) => {
+    return db
+      .query(`SELECT * FROM topics WHERE slug = $1`, [topic])
+      .then(({ rows }) => {
+        if (!rows.length) {
+          return Promise.reject({
+            status: 404,
+            msg: "Topic Not Found!",
+          });
+        } else {
+          return true;
+        }
+      });
+  };
+  const queryValues = [];
+
   let queryStr = `SELECT 
         articles.article_id, 
         articles.title, 
@@ -30,7 +46,7 @@ exports.selectAllArticles = (sort_by, order, topic) => {
         articles.article_img_url, 
         COUNT(comments.article_id) :: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
-  const queryValues = [];
+  const promiseArray = [];
 
   let sortGreenList = [
     "article_id",
@@ -54,15 +70,14 @@ exports.selectAllArticles = (sort_by, order, topic) => {
       msg: "Please enter a valid request!",
     });
   }
-  // Filter by
-  if (topic && !sortGreenList.includes(topic)) {
+
+  if (topic) {
     queryStr += ` WHERE articles.topic = $1`;
     queryValues.push(topic);
+    promiseArray.push(checkIfTopicExists(topic));
   }
 
   queryStr += ` GROUP BY articles.article_id`;
-
-  // Sort by and order
 
   if (sort_by && sortGreenList.includes(sort_by)) {
     queryStr += ` ORDER BY ${sort_by}`;
@@ -76,8 +91,10 @@ exports.selectAllArticles = (sort_by, order, topic) => {
     queryStr += ` desc`;
   }
 
-  return db.query(queryStr, queryValues).then(({ rows }) => {
-    return rows;
+  promiseArray.unshift(db.query(queryStr, queryValues));
+
+  return Promise.all(promiseArray).then(([articlesResult]) => {
+    return articlesResult.rows;
   });
 };
 
