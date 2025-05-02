@@ -94,7 +94,7 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
-describe.only("GET /api/articles", () => {
+describe("GET /api/articles", () => {
   test("200: OK if responds with an article array with comment_count property without body property", () => {
     return request(app)
       .get("/api/articles")
@@ -435,7 +435,7 @@ describe("GET /api/users", () => {
   });
 });
 
-describe.only("GET SORT BY /api/articles (sorting queries)", () => {
+describe("GET SORT BY /api/articles (sorting queries)", () => {
   test("200: OK if article is sort by created_at and descending by default", () => {
     return request(app)
       .get("/api/articles")
@@ -504,7 +504,7 @@ describe.only("GET SORT BY /api/articles (sorting queries)", () => {
 
 });
 
-describe.only("GET /api/articles (topic query)", () => {
+describe("GET /api/articles (topic query)", () => {
   test("200: OK if filters the articles by the topic value specified in the query", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
