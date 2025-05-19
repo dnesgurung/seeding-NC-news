@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const db = require("./db/connection");
+const cors = require('cors');
 
 const {
   getApi,
@@ -12,12 +13,15 @@ const {
   patchArticleByArticleId,
   deleteComments,
   getAllUsers,
+  getUser,
 } = require("./src/controllers/controllers");
 const {
   handlePSQLErrors,
   catchAllErrors,
   handleCustomErrors,
 } = require("./src/controllers/error.controller");
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -38,6 +42,8 @@ app.patch("/api/articles/:article_id", patchArticleByArticleId);
 app.delete("/api/comments/:comment_id", deleteComments);
 
 app.get("/api/users", getAllUsers);
+
+app.get("/api/users/:username", getUser )
 
 app.all("/*splat", (req, res) => {
   res.status(404).send({ msg: "invalid url!" });
