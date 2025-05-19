@@ -8,6 +8,7 @@ const {
   updateArticleByArticleId,
   deleteCommentsByCommentId,
   selectUsers,
+  selectUserByUserName,
 } = require("../models/models");
 
 exports.getApi = (request, response) => {
@@ -84,3 +85,8 @@ exports.getAllUsers = (req, res, next) => {
     res.status(200).send({ users });
   });
 };
+
+exports.getUser = ()=> {
+
+  return selectUserByUserName().then(()=> {})
+}

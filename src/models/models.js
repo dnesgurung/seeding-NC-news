@@ -199,3 +199,7 @@ exports.selectUsers = () => {
     return rows;
   });
 };
+
+exports.selectUserByUserName = ()=> {
+  
+}
